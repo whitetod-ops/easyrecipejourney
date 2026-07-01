@@ -3,14 +3,13 @@ export const metadata = {
 };
 
 export default function PrivacyPage() {
-  const year = new Date().getFullYear();
   return (
     <div style={{ background: '#F8F4EF', padding: '4rem 1.5rem' }}>
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
         <h1 style={{ fontFamily: 'Fraunces, Georgia, serif', fontSize: '2rem',
           fontWeight: 600, color: '#2C2018', marginBottom: 8 }}>Privacy Policy</h1>
         <p style={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: 13,
-          color: '#9A8070', marginBottom: 32 }}>Last updated: January {year}</p>
+          color: '#9A8070', marginBottom: 32 }}>Last updated: July 2026</p>
 
         {[
           ['Information we collect',

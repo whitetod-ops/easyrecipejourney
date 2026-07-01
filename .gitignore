@@ -43,3 +43,5 @@ test-drive.js
 test-drive-v2.js
 find-folder.js
 upload-recipes.js
+.env.local.txt
+*.zip

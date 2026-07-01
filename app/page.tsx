@@ -5,7 +5,7 @@ import RecipeCard from '@/components/RecipeCard';
 
 export const metadata = {
   title: 'Easy Recipe Journey — World Cuisines Made Easy',
-  description: '850+ easy recipes from 30+ cuisines. Step-by-step cooking instructions for everyone.',
+  description: '778 easy recipes from 30+ cuisines. Step-by-step cooking instructions for everyone.',
 };
 
 export default function HomePage() {
@@ -21,7 +21,7 @@ export default function HomePage() {
             <p style={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: 12,
               fontWeight: 600, color: '#8B5E3C', textTransform: 'uppercase',
               letterSpacing: '0.1em', marginBottom: 12 }}>
-              850+ recipes · 30+ cuisines
+              778 recipes · 30+ cuisines
             </p>
             <h1 style={{ fontFamily: 'Fraunces, Georgia, serif',
               fontSize: 'clamp(2rem, 5vw, 3.25rem)', fontStyle: 'italic',
@@ -128,11 +128,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <style>{`
-        @media (max-width: 768px) {
-          .hero-grid { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
     </div>
   );
 }

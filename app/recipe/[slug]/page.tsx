@@ -1,12 +1,12 @@
-import { getRecipeBySlug, getAllRecipeFiles, titleToSlug } from '@/lib/recipes';
+import { getRecipeBySlug, getAllRecipes, titleToSlug } from '@/lib/recipes';
 import { notFound } from 'next/navigation';
 import MeasurementConverter from '@/components/MeasurementConverter';
 
+export const revalidate = 3600;
+
 export async function generateStaticParams() {
-  const files = await getAllRecipeFiles();
-  return files.map(f => ({
-    slug: titleToSlug(f.name.replace(/\.docx$/i, '')),
-  }));
+  const recipes = await getAllRecipes();
+  return recipes.map(r => ({ slug: r.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
@@ -27,6 +27,23 @@ export default async function RecipePage({ params }: { params: Promise<{ slug: s
   const { slug } = await params;
   const recipe = await getRecipeBySlug(slug);
   if (!recipe) notFound();
+
+  const jsonLd = JSON.stringify({
+    '@context': 'https://schema.org/',
+    '@type': 'Recipe',
+    'name': recipe.title,
+    'image': recipe.photo_url ? [recipe.photo_url] : [],
+    'prepTime': recipe.prep_time,
+    'cookTime': recipe.cook_time,
+    'totalTime': recipe.total_time,
+    'recipeYield': recipe.servings,
+    'recipeCategory': recipe.course,
+    'recipeCuisine': recipe.cuisine,
+    'recipeIngredient': recipe.ingredients || [],
+    'recipeInstructions': (recipe.instructions || []).map((s: string) => ({
+      '@type': 'HowToStep', 'text': s,
+    })),
+  }).replace(/<\/script>/gi, '<\\/script>');
 
   return (
     <div style={{ background: '#F8F4EF', minHeight: '100vh' }}>
@@ -93,7 +110,7 @@ export default async function RecipePage({ params }: { params: Promise<{ slug: s
         </a>
 
         <div id="ingredients" style={{ marginBottom: 40 }}>
-          <MeasurementConverter ingredients={recipe.ingredients as any} />
+          <MeasurementConverter ingredients={recipe.ingredients as string[]} />
         </div>
 
         <div style={{ marginBottom: 40 }}>
@@ -119,22 +136,7 @@ export default async function RecipePage({ params }: { params: Promise<{ slug: s
           </ol>
         </div>
 
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
-          '@context': 'https://schema.org/',
-          '@type': 'Recipe',
-          'name': recipe.title,
-          'image': recipe.photo_url ? [recipe.photo_url] : [],
-          'prepTime': recipe.prep_time,
-          'cookTime': recipe.cook_time,
-          'totalTime': recipe.total_time,
-          'recipeYield': recipe.servings,
-          'recipeCategory': recipe.course,
-          'recipeCuisine': recipe.cuisine,
-          'recipeIngredient': recipe.ingredients || [],
-          'recipeInstructions': (recipe.instructions || []).map((s: string) => ({
-            '@type': 'HowToStep', 'text': s,
-          })),
-        })}} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd }} />
 
       </div>
     </div>

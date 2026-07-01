@@ -3,6 +3,8 @@ import { CUISINES } from '@/lib/cuisines';
 import { notFound } from 'next/navigation';
 import RecipeCard from '@/components/RecipeCard';
 
+export const revalidate = 3600;
+
 export async function generateStaticParams() {
   return CUISINES.map(c => ({ slug: c.slug }));
 }
@@ -47,7 +49,15 @@ export default async function CuisineSlugPage({ params }: { params: Promise<{ sl
           <div style={{ display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
             {recipes.map(r => (
-              <RecipeCard key={r.slug} {...r} photo={r.photo_url || ''} />
+              <RecipeCard
+                key={r.slug}
+                slug={r.slug}
+                title={r.title}
+                cuisine={r.cuisine}
+                course={r.course}
+                total_time={r.total_time}
+                photo={r.photo}
+              />
             ))}
           </div>
         )}

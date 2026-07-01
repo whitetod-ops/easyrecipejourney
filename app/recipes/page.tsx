@@ -1,52 +1,75 @@
-import Link from 'next/link';
-import { FEATURED_RECIPES } from '@/lib/cuisines';
+import { getAllRecipes } from '@/lib/recipes';
+import RecipeCard from '@/components/RecipeCard';
+import RecipesSearch from './RecipesSearch';
+
+export const revalidate = 3600;
 
 export const metadata = {
   title: 'All Recipes — Easy Recipe Journey',
-  description: '850+ easy world cuisine recipes. Search and filter by cuisine, course, and cook time.',
+  description: '778 easy world cuisine recipes. Search and filter by cuisine, course, and cook time.',
 };
 
-export default function RecipesPage() {
+const algoliaReady =
+  !!process.env.NEXT_PUBLIC_ALGOLIA_APP_ID &&
+  !!process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_KEY;
+
+export default async function RecipesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; surprise?: string }>;
+}) {
+  const { q, surprise } = await searchParams;
+
+  // Algolia search UI — hands off to the client component
+  if (algoliaReady && !surprise) {
+    return (
+      <div style={{ background: '#F8F4EF', padding: '3rem 1.5rem' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <h1 style={{ fontFamily: 'Fraunces, Georgia, serif',
+            fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontStyle: 'italic',
+            fontWeight: 600, color: '#2C2018', marginBottom: 32 }}>
+            All recipes
+          </h1>
+          <RecipesSearch initialQuery={q} />
+        </div>
+      </div>
+    );
+  }
+
+  // Fallback: server-rendered list (also handles ?surprise=1)
+  let recipes = await getAllRecipes();
+
+  if (surprise) {
+    const i = Math.floor(Math.random() * recipes.length);
+    recipes = [recipes[i]];
+  }
+
   return (
     <div style={{ background: '#F8F4EF', padding: '3rem 1.5rem' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-        <h1 style={{ fontFamily: 'Fraunces, Georgia, serif', fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
-          fontStyle: 'italic', fontWeight: 600, color: '#2C2018', marginBottom: 8 }}>
-          All recipes
+        <h1 style={{ fontFamily: 'Fraunces, Georgia, serif',
+          fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontStyle: 'italic',
+          fontWeight: 600, color: '#2C2018', marginBottom: 8 }}>
+          {surprise ? 'Your surprise recipe' : 'All recipes'}
         </h1>
         <p style={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: 14,
           color: '#9A8070', marginBottom: 32 }}>
-          850+ recipes from 30+ cuisines — more added regularly
+          {recipes.length} {recipes.length === 1 ? 'recipe' : 'recipes'}
         </p>
         <div style={{ display: 'grid',
           gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
-          {FEATURED_RECIPES.map((r) => (
-            <Link key={r.slug} href={`/recipe/${r.slug}`}
-              style={{ background: '#fff', borderRadius: 12, border: '0.5px solid #E0D0C0',
-                overflow: 'hidden', textDecoration: 'none', display: 'block' }}>
-              <div style={{ height: 180, background: '#E8D5C0', position: 'relative',
-                overflow: 'hidden' }}>
-                <img src={r.photo} alt={r.title}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              </div>
-              <div style={{ padding: '1rem 1.1rem 1.25rem' }}>
-                <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
-                  <span style={{ background: '#E8D5C0', color: '#6B5040',
-                    fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: 11, fontWeight: 500,
-                    padding: '3px 9px', borderRadius: 20 }}>{r.cuisine}</span>
-                </div>
-                <h2 style={{ fontFamily: 'Fraunces, Georgia, serif', fontSize: 16,
-                  fontWeight: 600, color: '#2C2018', marginBottom: 6 }}>{r.title}</h2>
-                <p style={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: 12,
-                  color: '#9A8070', margin: 0 }}>⏱ {r.total_time}</p>
-              </div>
-            </Link>
+          {recipes.map((r) => (
+            <RecipeCard
+              key={r.slug}
+              slug={r.slug}
+              title={r.title}
+              cuisine={r.cuisine}
+              course={r.course}
+              total_time={r.total_time}
+              photo={r.photo}
+            />
           ))}
         </div>
-        <p style={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: 13,
-          color: '#9A8070', textAlign: 'center', marginTop: 40 }}>
-          Full recipe library coming soon — connected to Google Drive
-        </p>
       </div>
     </div>
   );

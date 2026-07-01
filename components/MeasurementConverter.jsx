@@ -1,7 +1,6 @@
 'use client';
 import { useState } from 'react';
 
-// Conversion lookup: ingredient name keywords -> grams per cup (for weight conversions)
 const DENSITY = {
   'flour': { cup: 120, tbsp: 7.5, tsp: 2.5 },
   'sugar': { cup: 200, tbsp: 12.5, tsp: 4.2 },
@@ -19,7 +18,6 @@ const DENSITY = {
   'baking soda': { cup: 230, tbsp: 14.4, tsp: 4.8 },
 };
 
-// Volume conversions to ml
 const VOL_TO_ML = {
   'cup': 240, 'cups': 240,
   'tbsp': 15, 'tablespoon': 15, 'tablespoons': 15,
@@ -32,7 +30,6 @@ const VOL_TO_ML = {
   'l': 1000, 'liter': 1000, 'liters': 1000,
 };
 
-// Weight conversions to grams
 const WEIGHT_TO_G = {
   'oz': 28.35, 'ounce': 28.35, 'ounces': 28.35,
   'lb': 453.6, 'pound': 453.6, 'pounds': 453.6,
@@ -40,7 +37,6 @@ const WEIGHT_TO_G = {
   'kg': 1000, 'kilogram': 1000, 'kilograms': 1000,
 };
 
-// Fractions to decimals
 const FRACTIONS = {
   '¼': 0.25, '½': 0.5, '¾': 0.75,
   '⅓': 0.333, '⅔': 0.667,
@@ -52,11 +48,9 @@ function parseFraction(str) {
   for (const [frac, val] of Object.entries(FRACTIONS)) {
     str = str.replace(frac, ' ' + val + ' ');
   }
-  // Handle "1 1/2" style
   str = str.replace(/(\d+)\s+(\d+)\/(\d+)/, (_, w, n, d) => {
     return String(parseFloat(w) + parseFloat(n) / parseFloat(d));
   });
-  // Handle "1/2" style
   str = str.replace(/(\d+)\/(\d+)/, (_, n, d) => String(parseFloat(n) / parseFloat(d)));
   return parseFloat(str) || null;
 }
@@ -69,15 +63,19 @@ function getDensityKey(ingredientName) {
   return null;
 }
 
+function normUnit(unit) {
+  // Normalise plural volume units for DENSITY lookup (cup/tbsp/tsp keys)
+  return unit.replace(/s$/, '');
+}
+
 function formatNumber(n) {
   if (n === null || isNaN(n)) return null;
   if (Number.isInteger(n)) return String(n);
-  // Nice fractions for display
   const fracs = [[0.25,'¼'],[0.5,'½'],[0.75,'¾'],[0.333,'⅓'],[0.667,'⅔'],[0.125,'⅛']];
   const whole = Math.floor(n);
   const remainder = n - whole;
   for (const [val, sym] of fracs) {
-    if (Math.abs(remainder - val) < 0.05) {
+    if (Math.abs(remainder - val) < 0.02) {
       return (whole > 0 ? whole + ' ' : '') + sym;
     }
   }
@@ -85,7 +83,6 @@ function formatNumber(n) {
 }
 
 function convertIngredient(text, ingredientName, toMetric) {
-  // Try to parse: [amount] [unit] [rest]
   const unitPattern = Object.keys({ ...VOL_TO_ML, ...WEIGHT_TO_G }).join('|');
   const regex = new RegExp(
     `([\\d\\s\\/¼½¾⅓⅔⅛⅜⅝⅞]+)\\s*(${unitPattern})\\.?\\b`,
@@ -100,16 +97,14 @@ function convertIngredient(text, ingredientName, toMetric) {
   if (!amount) return text;
 
   if (toMetric) {
-    // US → Metric
     if (VOL_TO_ML[unit]) {
       const ml = amount * VOL_TO_ML[unit];
-      // If we know the density, convert to weight
       const densityKey = getDensityKey(ingredientName || text);
-      if (densityKey && DENSITY[densityKey][unit]) {
-        const grams = Math.round(amount * DENSITY[densityKey][unit]);
+      const densityUnit = normUnit(unit);
+      if (densityKey && DENSITY[densityKey][densityUnit]) {
+        const grams = Math.round(amount * DENSITY[densityKey][densityUnit]);
         return text.replace(match[0], grams + ' g');
       }
-      // Otherwise stay as volume in ml
       if (ml >= 1000) {
         return text.replace(match[0], formatNumber(ml / 1000) + ' L');
       }
@@ -121,14 +116,12 @@ function convertIngredient(text, ingredientName, toMetric) {
       return text.replace(match[0], g + ' g');
     }
   } else {
-    // Metric → US
     if (unit === 'g' || unit === 'gram' || unit === 'grams') {
       const densityKey = getDensityKey(ingredientName || text);
       if (densityKey) {
         const cups = amount / DENSITY[densityKey]['cup'];
         return text.replace(match[0], formatNumber(cups) + ' cup' + (cups !== 1 ? 's' : ''));
       }
-      // Convert to oz
       const oz = amount / 28.35;
       if (oz < 1) return text;
       return text.replace(match[0], formatNumber(oz) + ' oz');
