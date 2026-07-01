@@ -93,7 +93,7 @@ export default async function RecipePage({ params }: { params: Promise<{ slug: s
         </a>
 
         <div id="ingredients" style={{ marginBottom: 40 }}>
-          <MeasurementConverter ingredients={recipe.ingredients || []} />
+          <MeasurementConverter ingredients={(recipe.ingredients || []) as string[]} />
         </div>
 
         <div style={{ marginBottom: 40 }}>
