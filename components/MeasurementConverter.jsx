@@ -152,7 +152,7 @@ function convertIngredient(text, ingredientName, toMetric) {
   return text;
 }
 
-export default function MeasurementConverter({ ingredients = [] }: { ingredients: string[] }) {
+export default function MeasurementConverter({ ingredients = [] }) {
   const [isMetric, setIsMetric] = useState(false);
 
   const converted = ingredients.map(ing => {
