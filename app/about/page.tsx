@@ -14,7 +14,7 @@ export default function AboutPage() {
         <div style={{ height: 3, width: 48, background: '#8B5E3C', borderRadius: 2, marginBottom: 28 }} />
         <p style={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: 15,
           color: '#6B5040', lineHeight: 1.8, marginBottom: 20 }}>
-          Easy Recipe Journey is a world-cuisine recipe site with 850+ recipes
+          Easy Recipe Journey is a world-cuisine recipe site with 778 recipes
           spanning 30+ cuisines. Our mission is simple: make global cooking
           accessible to every home kitchen, with clear step-by-step instructions
           and real photos.

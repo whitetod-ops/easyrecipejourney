@@ -4,11 +4,6 @@ export default function Footer() {
   const year = new Date().getFullYear();
   return (
     <footer style={{ background: '#2C2018', borderTop: '1px solid #3D2E12', marginTop: 'auto' }}>
-      <style>{`
-        .footer-link { color: #9A8070 !important; text-decoration: none; display: block; font-family: "Plus Jakarta Sans", sans-serif; font-size: 13px; margin-bottom: 8px; }
-        .footer-link:hover { color: #E8D5C0 !important; }
-      `}</style>
-
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '3rem 1.5rem 2rem',
         display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem' }}>
 
@@ -19,7 +14,7 @@ export default function Footer() {
           </div>
           <p style={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: 13, color: '#9A8070',
             lineHeight: 1.7, margin: 0 }}>
-            850+ easy recipes from 30+ cuisines around the world.
+            778 easy recipes from 30+ cuisines around the world.
             Step-by-step cooking for every kitchen.
           </p>
         </div>

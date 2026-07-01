@@ -14,17 +14,6 @@ export default function Navbar() {
 
   return (
     <nav style={{ background: '#2C2018', borderBottom: '1px solid #3D2E12' }}>
-      <style>{`
-        .nav-link { color: #C4A882; transition: color 0.15s; }
-        .nav-link:hover { color: #E8D5C0 !important; }
-        .nav-desktop { display: flex; align-items: center; gap: 32px; }
-        .nav-burger { display: none; }
-        @media (max-width: 640px) {
-          .nav-desktop { display: none !important; }
-          .nav-burger { display: block !important; }
-        }
-      `}</style>
-
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 1.5rem',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 60 }}>
 
